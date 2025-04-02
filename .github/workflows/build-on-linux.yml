@@ -31,6 +31,7 @@ jobs:
         run: |
           mkdir caddy
           cd caddy
+          cp -f ../template.Caddyfile ./Caddyfile
           which docker || true;
           echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u "owt5008137" --password-stdin docker.io
           docker build --force-rm --tag docker.io/owt5008137/caddy:latest -f ../Dockerfile .
