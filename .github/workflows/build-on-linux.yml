@@ -1,0 +1,41 @@
+name: "Build On Linux"
+
+on: # @see https://help.github.com/en/articles/events-that-trigger-workflows#webhook-events
+  push:
+    branches: # Array of patterns that match refs/heads
+      - main
+    tags:
+      - "*"
+  schedule:
+    # * is a special character in YAML so you have to quote this string
+    - cron: "55 2 * * 3"
+
+jobs:
+  build_caddy_release: # job id, can be any string
+    # Job name is Build And Publish
+    name: Build caddy (release)
+    # This job runs on Linux
+    runs-on: ubuntu-latest
+    env:
+      GOOS: linux
+      GOARCH: amd64
+      CGO_ENABLED: 0
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      #- uses: actions/setup-go@v5
+      #  with:
+      #    go-version: ">=1.21.0"
+      - name: Build caddy server
+        shell: bash
+        run: |
+          mkdir caddy
+          cd caddy
+          which docker || true;
+          echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u "owt5008137" --password-stdin docker.io
+          docker build --force-rm --tag docker.io/owt5008137/caddy:latest -f ../Dockerfile .
+          docker push docker.io/owt5008137/caddy:latest
+          # Github package
+          echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          docker tag docker.io/owt5008137/caddy:latest ghcr.io/${{ github.repository_owner }}/caddy:latest
+          docker push ghcr.io/${{ github.repository_owner }}/caddy:latest
