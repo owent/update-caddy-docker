@@ -4,6 +4,8 @@ RUN xcaddy build --with github.com/caddy-dns/cloudflare --with github.com/caddy-
 
 FROM docker.io/caddy:latest
 
+LABEL org.opencontainers.image.source=https://github.com/owent/update-caddy-docker
+
 COPY --from=builder /usr/bin/caddy /usr/bin/caddy
 COPY Caddyfile /etc/caddy/Caddyfile
 

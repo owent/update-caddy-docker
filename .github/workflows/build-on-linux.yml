@@ -32,11 +32,17 @@ jobs:
           mkdir caddy
           cd caddy
           cp -f ../template.Caddyfile ./Caddyfile
+          ALIAS_TAG=$(date +%Y.%U)
           which docker || true;
           echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u "owt5008137" --password-stdin docker.io
           docker build --force-rm --tag docker.io/owt5008137/caddy:latest -f ../Dockerfile .
+          docker tag docker.io/owt5008137/caddy:latest docker.io/owt5008137/caddy:${ALIAS_TAG}
           docker push docker.io/owt5008137/caddy:latest
+          docker push docker.io/owt5008137/caddy:${ALIAS_TAG}
           # Github package
           echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+          docker tag docker.io/owt5008137/caddy:latest ghcr.io/${{ github.repository_owner }}/caddy:${ALIAS_TAG}
           docker tag docker.io/owt5008137/caddy:latest ghcr.io/${{ github.repository_owner }}/caddy:latest
+          docker tag docker.io/owt5008137/caddy:${ALIAS_TAG} ghcr.io/${{ github.repository_owner }}/caddy:latest
           docker push ghcr.io/${{ github.repository_owner }}/caddy:latest
+          docker push ghcr.io/${{ github.repository_owner }}/caddy:${ALIAS_TAG}
