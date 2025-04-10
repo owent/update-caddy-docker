@@ -1,3 +1,20 @@
+{
+	# auto_https disable_redirects
+	# auto_https off
+	# http_port 8999
+
+	# h2c
+	# auto_https off
+	servers :8375 {
+		protocols h1 h2 h2c h3
+	}
+}
+
+example.domain:8375 {
+	header Content-Type "text/html; charset=utf-8"
+	redir https://owent.net{uri} html
+}
+
 # Auto HTTPS: Internal
 example.domain {
 	root * /home/user/public_html
@@ -43,11 +60,6 @@ example.domain {
 }
 
 # Wbsocket reverse proxy
-{
-	auto_https disable_redirects
-	auto_https off
-	# http_port 8999
-}
 example.domain {
 	reverse_proxy /ws ws://localhost:8443 {
 		header_up Host {http.request.host}
@@ -60,16 +72,4 @@ example.domain {
 		#   versions "1.1 2"
 		# }
 	}
-}
-
-# h2c
-{
-	auto_https off
-	servers :8375 {
-		protocols h1 h2 h2c h3
-	}
-}
-example.domain:8375 {
-	header Content-Type "text/html; charset=utf-8"
-	redir https://owent.net{uri} html
 }

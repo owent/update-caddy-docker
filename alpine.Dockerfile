@@ -1,8 +1,8 @@
-FROM caddy:builder AS builder
+FROM caddy:builder-alpine AS builder
 
 RUN xcaddy build --with github.com/caddy-dns/cloudflare --with github.com/caddy-dns/dnspod --with github.com/caddy-dns/alidns --with github.com/caddy-dns/namecheap --with github.com/caddy-dns/tencentcloud --with github.com/caddy-dns/cloudns --with github.com/caddy-dns/azure --with github.com/caddy-dns/acmedns --with github.com/caddy-dns/godaddy
 
-FROM caddy:latest
+FROM caddy:alpine
 
 COPY --from=builder /usr/bin/caddy /usr/bin/caddy
 COPY Caddyfile /etc/caddy/Caddyfile

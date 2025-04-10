@@ -23,24 +23,26 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Download go.mod
-        shell: bash
-        run: |
-          CADDY_LATEST_VERSION=$(curl -L $GITHUB_TOKEN_ARGS 'https://api.github.com/repos/caddyserver/caddy/releases/latest' | grep tag_name | grep -E -o 'v[0-9]+[0-9\.]+' | head -n 1);
-          curl -L "https://github.com/caddyserver/caddy/blob/$CADDY_LATEST_VERSION/go.mod" > go.mod
-      - uses: actions/setup-go@v5
-        with:
-          go-version-file: go.mod
+      # - name: Download go.mod
+      #   shell: bash
+      #   run: |
+      #     CADDY_LATEST_VERSION=$(curl -L $GITHUB_TOKEN_ARGS 'https://api.github.com/repos/caddyserver/caddy/releases/latest' | grep tag_name | grep -E -o 'v[0-9]+[0-9\.]+' | head -n 1);
+      #     curl -L "https://github.com/caddyserver/caddy/blob/$CADDY_LATEST_VERSION/go.mod" > go.mod
+      # - uses: actions/setup-go@v5
+      #   with:
+      #     go-version-file: go.mod
       - name: Build caddy server
         shell: bash
         run: |
           mkdir caddy
           cd caddy
+          CADDY_LATEST_VERSION=$(curl -L $GITHUB_TOKEN_ARGS 'https://api.github.com/repos/caddyserver/caddy/releases/latest' | grep tag_name | grep -E -o 'v[0-9]+[0-9\.]+' | head -n 1);
           cp -f ../template.Caddyfile ./Caddyfile
+          sed -i -E "s;caddy:builder;caddy:$CADDY_LATEST_VERSION-builder;g" ./Caddyfile
           ALIAS_TAG=$(date +%Y.%U)
           which docker || true;
           echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u "owt5008137" --password-stdin docker.io
-          docker build --force-rm --tag docker.io/owt5008137/caddy:latest -f ../Dockerfile .
+          docker build --force-rm --tag docker.io/owt5008137/caddy:latest -f ../alpine.Dockerfile .
           docker tag docker.io/owt5008137/caddy:latest docker.io/owt5008137/caddy:${ALIAS_TAG}
           docker push docker.io/owt5008137/caddy:latest
           docker push docker.io/owt5008137/caddy:${ALIAS_TAG}
