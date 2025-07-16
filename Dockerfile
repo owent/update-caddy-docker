@@ -1,6 +1,7 @@
 FROM caddy:builder AS builder
 
-RUN xcaddy build --with github.com/caddy-dns/cloudflare --with github.com/caddy-dns/dnspod --with github.com/caddy-dns/alidns --with github.com/caddy-dns/namecheap --with github.com/caddy-dns/tencentcloud --with github.com/caddy-dns/cloudns --with github.com/caddy-dns/azure --with github.com/caddy-dns/acmedns --with github.com/caddy-dns/godaddy
+# RUN xcaddy build --with github.com/caddy-dns/cloudflare --with github.com/caddy-dns/dnspod --with github.com/caddy-dns/alidns --with github.com/caddy-dns/namecheap --with github.com/caddy-dns/tencentcloud --with github.com/caddy-dns/cloudns --with github.com/caddy-dns/azure --with github.com/caddy-dns/acmedns --with github.com/caddy-dns/godaddy
+RUN xcaddy build --with github.com/caddy-dns/cloudflare --with github.com/caddy-dns/alidns --with github.com/caddy-dns/tencentcloud --with github.com/caddy-dns/cloudns --with github.com/caddy-dns/azure --with github.com/caddy-dns/acmedns
 
 FROM caddy:latest
 
