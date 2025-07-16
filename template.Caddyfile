@@ -1,7 +1,28 @@
 {
+	# log {
+	#   output file /var/log/caddy/caddy.log {
+	#      roll_size 100MiB
+	#      roll_uncompressed
+	#      roll_local_time
+	#      roll_keep 10
+	#      roll_keep_for 2160h
+	#   }
+	#   format json
+	#   level ERROR # INFO/ERROR
+	# }
 	# auto_https disable_redirects
 	# auto_https off
 	# http_port 8999
+
+	# email eab_account@example.org
+	# # Notice: wildcard and multi-domain certificates require DNSSEC validation to be enabled at the domain registrar
+	# cert_issuer acme {
+	#   dir https://acme.zerossl.com/v2/DV90
+	#   email eab_account@example.org
+	#   # https://zerossl.com/documentation/acme/
+	#   # https://app.zerossl.com/developer
+	#   eab <key_id> <mac_key>
+	# }
 
 	# h2c
 	# auto_https off
@@ -38,6 +59,7 @@ example.domain {
 		protocols tls1.2 tls1.3
 		key_type p256
 		dns cloudflare {env.CF_API_TOKEN} # Require Zone.Zone READ, Zone.DNS EDIT
+		on_demand
 	}
 }
 
@@ -55,7 +77,20 @@ example.domain {
 	tls {
 		protocols tls1.2 tls1.3
 		key_type p256
-		dns dnspod {env.DNSPOD_TOKEN}
+		# dnspod is removed temporary because it do not suport Caddy v2.10.0+
+		# dns dnspod {env.DNSPOD_TOKEN}
+		# Notice: wildcard and multi-domain certificates require DNSSEC validation to be enabled at the domain registrar
+		# dns must be in issuer block in new version of caddy
+		issuer acme {
+			dir https://acme.zerossl.com/v2/DV90
+			email eab_account@example.org
+			# https://zerossl.com/documentation/acme/
+			# https://app.zerossl.com/developer
+			eab {env.ZEROSSL_EAB_KEY_ID} {env.ZEROSSL_EAB_MAC_KEY}
+			# dns dnspod {env.DNSPOD_TOKEN}
+			dns cloudflare {env.CF_API_TOKEN} # Require Zone.Zone READ, Zone.DNS EDIT
+		}
+		on_demand
 	}
 }
 
